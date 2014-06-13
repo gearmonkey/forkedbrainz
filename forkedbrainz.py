@@ -80,7 +80,10 @@ def get_intersection(mbz_id=None):
         return g.common_reviews
     else:
         return g.common_reviews[mbz_id]
-        
+
+# def cb_review_cleanup(review):
+#     while review.find("(http://")
+
 @app.route('/') 
 def home():
     db = get_db()
@@ -145,21 +148,23 @@ def judgement():
     if len(review_text_b) > max_len:
         review_text_b = review_text_b[:max_len] + "..."
     session['which_pf'] = which_pf
-    session['pitchfork'] = dict(pf_review)
-    session['cb'] = dict(cb_review)
+    session['artist'] = pf_review['artist']
+    session['album'] = pf_review['album']
     return render_template('judgement.html', cb_review=cb_review, pf_review=pf_review, sp_uri=sp_uri, review_text_a=review_text_a, review_text_b=review_text_b)
     
 @app.route('/eval', methods=["POST"])
 def evaluate():
     submitted_answer = request.form['picked_review']
     correct_answer = session['which_pf']
+    artist = session['artist']
+    album = session['album']
     if submitted_answer == correct_answer:
         result = "CORRECT!"
     else:
         result = "WRONG!"
     # pf_review = session['pitchfork']
     # cb_review = session['cb']
-    return render_template('eval.html', result=result)
+    return render_template('eval.html', result=result, artist=artist, album=album)
     
 if __name__ == '__main__':
   app.run(debug=True)
