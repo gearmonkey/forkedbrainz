@@ -150,6 +150,8 @@ def judgement():
     session['which_pf'] = which_pf
     session['artist'] = pf_review['artist']
     session['album'] = pf_review['album']
+    session['pf_url'] = pf_review['url']
+    session['cb_url'] = "http://critiquebrainz.org/review/" + cb_review['id']
     return render_template('judgement.html', cb_review=cb_review, pf_review=pf_review, sp_uri=sp_uri, review_text_a=review_text_a, review_text_b=review_text_b)
     
 @app.route('/eval', methods=["POST"])
@@ -158,13 +160,15 @@ def evaluate():
     correct_answer = session['which_pf']
     artist = session['artist']
     album = session['album']
+    pf_url = session['pf_url']
+    cb_url = session['cb_url']
     if submitted_answer == correct_answer:
         result = "CORRECT!"
     else:
         result = "WRONG!"
     # pf_review = session['pitchfork']
     # cb_review = session['cb']
-    return render_template('eval.html', result=result, artist=artist, album=album)
+    return render_template('eval.html', result=result, artist=artist, album=album, pf_url=pf_url, cb_url=cb_url)
     
 if __name__ == '__main__':
   app.run(debug=True)
