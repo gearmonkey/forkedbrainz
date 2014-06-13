@@ -84,14 +84,7 @@ def get_intersection(mbz_id=None):
 @app.route('/') 
 def home():
     db = get_db()
-    cur = db.execute('select review_A_source,\
-                                review_A_id,\
-                                review_B_source,\
-                                review_B_id,\
-                                question,\
-                            winner from entries order by time desc limit 5')
-    recent = cur.fetchall()
-    return render_template('show_entries.html', recent=recent)
+    return render_template('index.html')
 
 @app.route('/reviewsfor/<mbz_id>')
 def reviews_for(mbz_id):
@@ -152,11 +145,21 @@ def judgement():
     if len(review_text_b) > max_len:
         review_text_b = review_text_b[:max_len] + "..."
     session['which_pf'] = which_pf
+    session['pitchfork'] = dict(pf_review)
+    session['cb'] = dict(cb_review)
     return render_template('judgement.html', cb_review=cb_review, pf_review=pf_review, sp_uri=sp_uri, review_text_a=review_text_a, review_text_b=review_text_b)
     
-@app.route('/eval')
+@app.route('/eval', methods=["POST"])
 def evaluate():
-    pass
+    submitted_answer = request.form['picked_review']
+    correct_answer = session['which_pf']
+    if submitted_answer == correct_answer:
+        result = "CORRECT!"
+    else:
+        result = "WRONG!"
+    # pf_review = session['pitchfork']
+    # cb_review = session['cb']
+    return render_template('eval.html', result=result)
     
 if __name__ == '__main__':
   app.run(debug=True)
